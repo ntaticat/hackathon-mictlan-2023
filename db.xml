@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <root>
+     <sensores>
+         <dato>20.22</dato>
+         <id>1</id>
+         <nombre>Sensor Ultrasonico</nombre>
+     </sensores>
+     <sensores>
+         <dato>20</dato>
+         <id>2</id>
+         <nombre>pepe</nombre>
+     </sensores>
+     <sensores>
+         <dato>2323.432</dato>
+         <id>3</id>
+         <nombre>QWea</nombre>
+     </sensores>
+     <sensores>
+         <dato>sdfsdfsd</dato>
+         <id>sadasdas</id>
+         <nombre>fsdfsdf</nombre>
+     </sensores>
+     <sensores>
+         <dato>22</dato>
+         <id>4</id>
+         <nombre>Rafael</nombre>
+     </sensores>
+     <sensores>
+         <dato>44</dato>
+         <id>5</id>
+         <nombre>Juanito</nombre>
+     </sensores>
+ </root>

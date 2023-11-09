@@ -1,0 +1,39 @@
+{
+    "sensores": [
+        {
+            "dato": "20.22",
+            "id": 1,
+            "nombre": "Sensor Ultrasonico"
+        },
+        {
+            "dato": "20",
+            "id": "2",
+            "nombre": "pepe"
+        },
+        {
+            "dato": "2323.432",
+            "id": "3",
+            "nombre": "QWea"
+        },
+        {
+            "dato": "sdfsdfsd",
+            "id": "sadasdas",
+            "nombre": "fsdfsdf"
+        },
+        {
+            "dato": "22",
+            "id": "4",
+            "nombre": "Rafael"
+        },
+        {
+            "dato": "44",
+            "id": "5",
+            "nombre": "Juanito"
+        },
+        {
+            "dato": "55.55",
+            "id": "777",
+            "nombre": "Juanito"
+        }
+    ]
+}

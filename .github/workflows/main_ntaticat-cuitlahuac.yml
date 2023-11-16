@@ -64,4 +64,4 @@ jobs:
         with:
           app-name: 'ntaticat-cuitlahuac'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DC0A9188EDA945D186CD973AD22FEB0C }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CA1F8CA4BF5B4B0F80CDC80D20715EB0 }}

@@ -2,6 +2,7 @@ version: '3.3'
 services:
   db:
     image: mysql:5.7
+    container_name: mysql
     restart: always
     environment:
       MYSQL_DATABASE: 'flaskmysql'
@@ -20,6 +21,15 @@ services:
       # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
-# Names our volume
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    volumes:
+      - mosquittoconf:/mosquitto/
+    ports:
+      - "1883:1883"
+      - "9001:9001"
 volumes:
   my-db:
+  mosquittoconf:

@@ -1,18 +1,19 @@
-from flask import Flask, jsonify, request, json
+from flask import Flask, jsonify, request, json, abort
 from flask_cors import CORS
-from flask_mqtt import Mqtt
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-import os
-import logging
 
-logging.basicConfig(level=logging.DEBUG)
+app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ntaticat:Password123!@localhost/flaskmysql'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-mqtt = Mqtt()
-db = SQLAlchemy()
-ma = Marshmallow()
+db = SQLAlchemy(app)
+marshmallow_client = Marshmallow(app)
+
+app.app_context().push()
+db.create_all()
 
 class SensorData(db.Model):
     sensordata_id = db.Column(db.Integer, primary_key=True)
@@ -37,12 +38,11 @@ class Sensor(db.Model):
         self.description = description
         self.topic = topic
 
-
-class SensorSchema(ma.Schema):
+class SensorSchema(marshmallow_client.Schema):
     class Meta:
         fields = ('sensor_id', 'name', 'mac_addr', 'description', 'topic')
 
-class SensorDataSchema(ma.Schema):
+class SensorDataSchema(marshmallow_client.Schema):
     class Meta:
         fields = ('sensordata_id', 'sensor_mac', 'data')
 
@@ -52,41 +52,24 @@ sensors_schema = SensorSchema(many=True)
 sensordata_schema = SensorDataSchema()
 sensorsdata_schema = SensorDataSchema(many=True)
 
-@mqtt.on_connect()
-def handle_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print('Connected to mqtt successfully')
-        mqtt.subscribe('flask/esp32/#')
-    else:
-        print('Bad connection. Code:', rc)
-
-@mqtt.on_message()
-def handle_mqtt_message(client, userdata, message):
-    data = dict(
-        topic=message.topic,
-        payload=message.payload.decode()
-    )
-
-    sensor_topic = message.topic
-    sensor_data = message.payload.decode()
-
-    new_sensordata = SensorData('wea', sensor_data)
-
-    db.session.add(new_sensordata)
-    db.session.commit()
-
-    print('Received message on topic: {topic} with payload: {payload}'.format(**data))
-
-@mqtt.on_log()
-def handle_logging(client, userdata, level, buf):
-    if level == MQTT_LOG_ERR:
-        print('Error: {}'.format(buf))
-
-@app.route("/api/sensors")
+@app.route("/api/sensores")
 def get_sensores():
-    return sensors_schema.jsonify(Sensor.query.all()), 200
+    args = request.args
 
-@app.route("/api/sensors", methods=['POST'])
+    mac_addr = args.get("mac")
+    print(mac_addr)
+
+    if mac_addr != None:
+        db_sensor = db.session.query(Sensor).filter(Sensor.mac_addr == mac_addr).first()
+        
+        if db_sensor == None:
+            abort(404)
+
+        return sensor_schema.jsonify(db_sensor), 200
+
+    return sensors_schema.jsonify(db.session.query(Sensor).all()), 200
+
+@app.route("/api/sensores", methods=['POST'])
 def post_sensores():
     
     sensor_name = request.json['name']
@@ -101,22 +84,6 @@ def post_sensores():
     
     return sensor_schema.jsonify(new_sensor), 201
 
-def create_app():
-    app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ntaticat:Password123!@localhost/flaskmysql'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    app.config['MQTT_BROKER_URL'] = 'localhost'
-    app.config['MQTT_BROKER_PORT'] = 1883
-    app.config['MQTT_USERNAME'] = ''
-    app.config['MQTT_PASSWORD'] = ''
-    app.config['MQTT_KEEPALIVE'] = 5
-    app.config['MQTT_TLS_ENABLED'] = False
-
-    mqtt.init_app(app=app)
-    db.init_app(app=app)
-    ma.init_app(app=app)
-
-    app.app_context().push()
-    db.create_all()
+if __name__ == '__main__':
+    app.run(host='192.168.0.166', port=5000, debug=True)

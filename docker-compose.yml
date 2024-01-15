@@ -21,15 +21,5 @@ services:
       # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
-
-  mosquitto:
-    image: eclipse-mosquitto:latest
-    container_name: mosquitto
-    volumes:
-      - mosquittoconf:/mosquitto/
-    ports:
-      - "1883:1883"
-      - "9001:9001"
 volumes:
   my-db:
-  mosquittoconf:
